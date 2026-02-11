@@ -4,6 +4,8 @@ namespace App\Modules\Supplier\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Modules\Product\Models\Product;
+use Database\Factories\SupplierFactory;
 
 class Supplier extends Model
 {
@@ -33,6 +35,14 @@ class Supplier extends Model
     ];
 
     /**
+     * Get products for this supplier
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    /**
      * Scope for active suppliers
      */
     public function scopeActive($query)
@@ -46,5 +56,10 @@ class Supplier extends Model
     public function scopeInactive($query)
     {
         return $query->where('status', 'inactive');
+    }
+
+    protected static function newFactory()
+    {
+        return SupplierFactory::new();
     }
 }

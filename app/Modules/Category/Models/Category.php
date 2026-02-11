@@ -4,6 +4,8 @@ namespace App\Modules\Category\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Modules\Product\Models\Product;
+use Database\Factories\CategoryFactory;
 
 class Category extends Model
 {
@@ -17,13 +19,24 @@ class Category extends Model
         'description',
     ];
 
+    protected static function newFactory()
+    {
+        return CategoryFactory::new();
+    }
+
     /**
-     * Get products count for this category
-     * We'll add relationship when Product model is created
+     * Get products for this category
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    /**
+     * Get products count
      */
     public function getProductCountAttribute(): int
     {
-        // Will be updated when Product model exists
-        return 0;
+        return $this->products()->count();
     }
 }

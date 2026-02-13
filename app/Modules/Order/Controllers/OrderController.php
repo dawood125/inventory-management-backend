@@ -10,6 +10,7 @@ use App\Modules\Product\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Modules\Order\Events\OrderCompleted;
 
 class OrderController extends Controller
 {
@@ -37,7 +38,7 @@ class OrderController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('order_number', 'like', "%{$search}%")
-                  ->orWhere('customer_name', 'like', "%{$search}%");
+                    ->orWhere('customer_name', 'like', "%{$search}%");
             });
         }
 
@@ -124,7 +125,6 @@ class OrderController extends Controller
                     'order' => $order
                 ]
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -195,11 +195,10 @@ class OrderController extends Controller
         // Update order status
         $order->update(['status' => $newStatus]);
 
-        // TODO: Fire event when order is completed
-        // We will add this in Stock module
-        // if ($newStatus === 'completed') {
-        //     event(new OrderCompleted($order));
-        // }
+        // 🔥 FIRE EVENT when order is completed!
+        if ($newStatus === 'completed') {
+            event(new OrderCompleted($order));
+        }
 
         return response()->json([
             'success' => true,
